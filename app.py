@@ -32,5 +32,5 @@ def pet(id):
     pet = next((p for p in pets if p["id"] == id), None)
     return render_template("pet.html", pet=pet)
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     app.run(debug=True)
