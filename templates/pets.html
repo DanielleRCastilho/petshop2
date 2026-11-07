@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titulo %}Pets{% endblock %}
+{% block conteudo %}
+<h2>Pets cadastrados</h2>
+<ul>
+    {% for p in pets %}
+    <li><a href="/pet/{{ p.id }}">{{ p.nome }}</a> ({{ p.especie }})</li>
+    {% endfor %}
+</ul>
+{% endblock %}

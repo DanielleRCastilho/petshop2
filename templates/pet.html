@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Pet{% endblock %}
+{% block conteudo %}
+{% if pet %}
+<h2>{{ pet.nome }}</h2>
+<p>Espécie: {{ pet.especie }}</p>
+<p>Dono: {{ pet.dono }}</p>
+{% else %}
+<p>Pet não encontrado.</p>
+{% endif %}
+<a href="/pets">Voltar</a>
+{% endblock %}
