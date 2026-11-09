@@ -1,6 +1,10 @@
 from flask import Flask, render_template
 
+import db_sql
+
 app = Flask(__name__)
+
+db_sql.init_app(app)
 
 pets = [
     {"id": 1, "nome": "Rex", "especie": "Cachorro", "dono": "Ana"},
