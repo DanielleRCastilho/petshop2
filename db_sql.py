@@ -79,3 +79,4 @@ def excluir_pet(id):
    db = get_db()
    db.execute("DELETE FROM pets WHERE id = ?", (id,))
    db.commit()
+   
