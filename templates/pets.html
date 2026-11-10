@@ -3,8 +3,9 @@
 {% block conteudo %}
 <h2>Pets cadastrados</h2>
 <ul>
-    {% for p in pets %}
-    <li><a href="/pet/{{ p.id }}">{{ p.nome }}</a> ({{ p.especie }})</li>
-    {% endfor %}
+   {% for p in pets %}
+<li><a href="/pet/{{ p.id }}">{{ p.nome }}</a> ({{ p.raca or '' }}) - dono: {{ p.dono }}</li>
+   {% endfor %}
 </ul>
+<a href="/pets/novo">Novo pet</a>
 {% endblock %}

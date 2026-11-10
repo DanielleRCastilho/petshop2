@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Donos{% endblock %}
+{% block conteudo %}
+<h2>Donos cadastrados</h2>
+<ul>
+   {% for d in donos %}
+<li>{{ d.nome }} - {{ d.tel or '' }} - {{ d.email or '' }}</li>
+   {% endfor %}
+</ul>
+<a href="/donos/novo">Novo dono</a>
+{% endblock %}

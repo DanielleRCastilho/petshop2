@@ -3,8 +3,12 @@
 {% block conteudo %}
 {% if pet %}
 <h2>{{ pet.nome }}</h2>
-<p>Espécie: {{ pet.especie }}</p>
+<p>Raça: {{ pet.raca or '' }}</p>
 <p>Dono: {{ pet.dono }}</p>
+<a href="/pet/{{ pet.id }}/editar">Editar</a>
+<form method="post" action="/pet/{{ pet.id }}/excluir" onsubmit="return confirm('Excluir este pet?')">
+<button type="submit">Excluir</button>
+</form>
 {% else %}
 <p>Pet não encontrado.</p>
 {% endif %}
