@@ -1,11 +1,13 @@
 {% extends "base.html" %}
-{% block titulo %}Novo dono{% endblock %}
+{% block titulo %}{{ 'Editar dono' if dono else 'Novo dono' }}{% endblock %}
 {% block conteudo %}
-<h2>Novo dono</h2>
+<h2>{{ 'Editar dono' if dono else 'Novo dono' }}</h2>
+{% if erro %}<p role="alert">{{ erro }}</p>{% endif %}
 <form method="post">
-<p><label>Nome: <input type="text" name="nome" required></label></p>
-<p><label>Telefone: <input type="text" name="tel"></label></p>
-<p><label>Email: <input type="email" name="email"></label></p>
+<p><label>Nome: <input type="text" name="nome" value="{{ nome if nome is defined else (dono.nome if dono else '') }}" required></label></p>
+<p><label>Telefone: <input type="text" name="tel" value="{{ tel if tel is defined else (dono.tel or '' if dono else '') }}"></label></p>
+<p><label>Email: <input type="email" name="email" value="{{ email if email is defined else (dono.email or '' if dono else '') }}"></label></p>
 <button type="submit">Salvar</button>
 </form>
+<a href="{{ url_for('lista_donos') }}">Voltar</a>
 {% endblock %}

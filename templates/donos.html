@@ -4,8 +4,15 @@
 <h2>Donos cadastrados</h2>
 <ul>
    {% for d in donos %}
-<li>{{ d.nome }} - {{ d.tel or '' }} - {{ d.email or '' }}</li>
+<li>
+   {{ d.nome }} - {{ d.tel or '' }} - {{ d.email or '' }}
+   <a href="{{ url_for('editar_dono', id=d.id) }}">Editar</a>
+   <form method="post" action="{{ url_for('excluir_dono', id=d.id) }}" style="display:inline"
+         onsubmit="return confirm('Excluir este dono? Os pets e serviços vinculados também serão excluídos.')">
+      <button type="submit">Excluir</button>
+   </form>
+</li>
    {% endfor %}
 </ul>
-<a href="/donos/novo">Novo dono</a>
+<a href="{{ url_for('novo_dono') }}">Novo dono</a>
 {% endblock %}

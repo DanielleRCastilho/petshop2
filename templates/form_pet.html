@@ -2,6 +2,8 @@
 {% block titulo %}Pet{% endblock %}
 {% block conteudo %}
 <h2>{{ 'Editar pet' if pet else 'Novo pet' }}</h2>
+{% if erro %}<p role="alert">{{ erro }}</p>{% endif %}
+{% if donos %}
 <form method="post">
 <p><label>Nome: <input type="text" name="nome" value="{{ pet.nome if pet else '' }}" required></label></p>
 <p><label>Raça: <input type="text" name="raca" value="{{ pet.raca or '' if pet else '' }}"></label></p>
@@ -14,7 +16,7 @@
 </label></p>
 <button type="submit">Salvar</button>
 </form>
-{% if not donos %}
+{% else %}
 <p>Cadastre um dono antes: <a href="/donos/novo">Novo dono</a></p>
 {% endif %}
 {% endblock %}

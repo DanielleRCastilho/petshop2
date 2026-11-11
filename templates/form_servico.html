@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Editar serviço' if servico else 'Novo serviço' }}{% endblock %}
+{% block conteudo %}
+<h2>{{ 'Editar serviço' if servico else 'Novo serviço' }}</h2>
+{% if erro %}<p role="alert">{{ erro }}</p>{% endif %}
+{% if pets %}
+<form method="post">
+   <p><label>Tipo: <input type="text" name="tipo" value="{{ servico.tipo if servico else '' }}" required></label></p>
+   <p><label>Data: <input type="date" name="data" value="{{ servico.data if servico else '' }}" required></label></p>
+   <p><label>Preço: <input type="number" name="preco" min="0" step="0.01" value="{{ servico.preco if servico and servico.preco is not none else '' }}"></label></p>
+   <p><label>Pet:
+      <select name="pet_id" required>
+         {% for p in pets %}
+         <option value="{{ p.id }}" {% if servico and servico.pet_id == p.id %}selected{% endif %}>{{ p.nome }} (dono: {{ p.dono }})</option>
+         {% endfor %}
+      </select>
+   </label></p>
+   <button type="submit">Salvar</button>
+</form>
+{% else %}
+<p>Cadastre um pet antes de registrar um serviço: <a href="{{ url_for('novo_pet') }}">Novo pet</a></p>
+{% endif %}
+<a href="{{ url_for('lista_servicos') }}">Voltar</a>
+{% endblock %}

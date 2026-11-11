@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block titulo %}Serviços{% endblock %}
+{% block conteudo %}
+<h2>Serviços cadastrados</h2>
+{% if servicos %}
+<ul>
+   {% for s in servicos %}
+   <li>
+      <a href="{{ url_for('servico', id=s.id) }}">{{ s.tipo }}</a>
+      - {{ s.data }} - pet: {{ s.pet }} (dono: {{ s.dono }})
+      - {{ 'R$ %.2f'|format(s.preco) if s.preco is not none else 'Sem preço' }}
+   </li>
+   {% endfor %}
+</ul>
+{% else %}
+<p>Nenhum serviço cadastrado.</p>
+{% endif %}
+<a href="{{ url_for('novo_servico') }}">Novo serviço</a>
+{% endblock %}
