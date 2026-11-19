@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, abort, render_template, request, redirect, url_for
 import db_sql
 app = Flask(__name__)
 db_sql.init_app(app)
@@ -10,6 +10,51 @@ def index():
 @app.route("/sobre")
 def sobre():
    return render_template("sobre.html")
+
+@app.route("/servicos")
+def servicos():
+   return render_template("servicos.html", servicos=db_sql.listar_servicos())
+
+@app.route("/servicos/novo", methods=["GET", "POST"])
+def novo_servico():
+   pets = db_sql.listar_pets()
+   if request.method == "POST":
+       if not pets:
+           abort(400, description="Cadastre um pet antes de registrar um serviço.")
+       db_sql.inserir_servico(
+           request.form["tipo"],
+           request.form["data"],
+           request.form["preco"] or None,
+           request.form["pet_id"],
+       )
+       return redirect(url_for("servicos"))
+   return render_template(
+       "form_servico.html", servico=None, pets=pets
+   )
+
+@app.route("/servico/<int:id>/editar", methods=["GET", "POST"])
+def editar_servico(id):
+   servico = db_sql.buscar_servico(id)
+   if servico is None:
+       abort(404)
+   pets = db_sql.listar_pets()
+   if request.method == "POST":
+       db_sql.atualizar_servico(
+           id,
+           request.form["tipo"],
+           request.form["data"],
+           request.form["preco"] or None,
+           request.form["pet_id"],
+       )
+       return redirect(url_for("servicos"))
+   return render_template("form_servico.html", servico=servico, pets=pets)
+
+@app.route("/servico/<int:id>/excluir", methods=["POST"])
+def excluir_servico(id):
+   if db_sql.buscar_servico(id) is None:
+       abort(404)
+   db_sql.excluir_servico(id)
+   return redirect(url_for("servicos"))
 
 @app.route("/contato")
 def contato():
@@ -28,7 +73,29 @@ def novo_dono():
            request.form["email"] or None,
        )
        return redirect(url_for("lista_donos"))
-   return render_template("form_dono.html")
+   return render_template("form_dono.html", dono=None)
+
+@app.route("/dono/<int:id>/editar", methods=["GET", "POST"])
+def editar_dono(id):
+   dono = db_sql.buscar_dono(id)
+   if dono is None:
+       abort(404)
+   if request.method == "POST":
+       db_sql.atualizar_dono(
+           id,
+           request.form["nome"],
+           request.form["tel"],
+           request.form["email"] or None,
+       )
+       return redirect(url_for("lista_donos"))
+   return render_template("form_dono.html", dono=dono)
+
+@app.route("/dono/<int:id>/excluir", methods=["POST"])
+def excluir_dono(id):
+   if db_sql.buscar_dono(id) is None:
+       abort(404)
+   db_sql.excluir_dono(id)
+   return redirect(url_for("lista_donos"))
 
 @app.route("/pets")
 def lista_pets():
@@ -51,6 +118,9 @@ def novo_pet():
 
 @app.route("/pet/<int:id>/editar", methods=["GET", "POST"])
 def editar_pet(id):
+   pet = db_sql.buscar_pet(id)
+   if pet is None:
+       abort(404)
    if request.method == "POST":
        db_sql.atualizar_pet(
            id,
@@ -60,11 +130,13 @@ def editar_pet(id):
        )
        return redirect(url_for("pet", id=id))
    return render_template(
-       "form_pet.html", pet=db_sql.buscar_pet(id), donos=db_sql.listar_donos()
+       "form_pet.html", pet=pet, donos=db_sql.listar_donos()
    )
 
 @app.route("/pet/<int:id>/excluir", methods=["POST"])
 def excluir_pet(id):
+   if db_sql.buscar_pet(id) is None:
+       abort(404)
    db_sql.excluir_pet(id)
    return redirect(url_for("lista_pets"))
 

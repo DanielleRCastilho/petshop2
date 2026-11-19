@@ -1,11 +1,29 @@
 {% extends "base.html" %}
+
 {% block titulo %}Pets{% endblock %}
+
 {% block conteudo %}
-<h2>Pets cadastrados</h2>
-<ul>
-   {% for p in pets %}
-<li><a href="/pet/{{ p.id }}">{{ p.nome }}</a> ({{ p.raca or '' }}) - dono: {{ p.dono }}</li>
-   {% endfor %}
-</ul>
-<a href="/pets/novo">Novo pet</a>
+<section class="card">
+    <div class="page-title">
+        <h1>Pets cadastrados</h1>
+        <a class="button" href="{{ url_for('novo_pet') }}">Novo pet</a>
+    </div>
+
+    {% if pets %}
+    <div class="pet-list">
+        {% for p in pets %}
+        <a class="pet-card" href="{{ url_for('pet', id=p.id) }}">
+            <strong>{{ p.nome }}</strong>
+            Raça: {{ p.raca or 'Não informada' }}<br>
+            Dono: {{ p.dono }}
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p class="empty">Nenhum pet cadastrado ainda.</p>
+        <a class="button" href="{{ url_for('novo_pet') }}">Cadastrar primeiro pet</a>
+    </div>
+    {% endif %}
+</section>
 {% endblock %}

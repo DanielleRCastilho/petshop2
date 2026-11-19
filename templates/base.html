@@ -2,24 +2,52 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>{% block titulo %}Pet Shop{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}Pet Shop Amigo Fiel{% endblock %}</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
     <header>
-        <h1>Pet Shop Amigo Fiel</h1>
-        <nav>
-            <a href="/">Início</a> |
-            <a href="/pets">Pets</a> |
-            <a href="/donos">Donos</a> |
-            <a href="/sobre">Sobre</a> |
-            <a href="/contato">Contato</a>
-        </nav>
+        <div class="header-content">
+            <a class="brand" href="{{ url_for('index') }}">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 48 48" focusable="false">
+                        <ellipse cx="24" cy="31" rx="12" ry="9"></ellipse>
+                        <ellipse cx="12" cy="20" rx="4" ry="6"></ellipse>
+                        <ellipse cx="21" cy="14" rx="4" ry="6"></ellipse>
+                        <ellipse cx="30" cy="14" rx="4" ry="6"></ellipse>
+                        <ellipse cx="38" cy="20" rx="4" ry="6"></ellipse>
+                    </svg>
+                </span>
+                <span>Pet Shop Amigo Fiel</span>
+            </a>
+
+            <nav aria-label="Navegação principal">
+                <a href="{{ url_for('index') }}"
+                   {% if request.endpoint == 'index' %}class="active" aria-current="page"{% endif %}>Início</a>
+                <a href="{{ url_for('lista_pets') }}"
+                   {% if request.endpoint in ['lista_pets', 'pet', 'novo_pet', 'editar_pet', 'excluir_pet'] %}class="active" aria-current="page"{% endif %}>Pets</a>
+                <a href="{{ url_for('lista_donos') }}"
+                   {% if request.endpoint in ['lista_donos', 'novo_dono', 'editar_dono', 'excluir_dono'] %}class="active" aria-current="page"{% endif %}>Donos</a>
+                <a href="{{ url_for('sobre') }}"
+                   {% if request.endpoint == 'sobre' %}class="active" aria-current="page"{% endif %}>Sobre</a>
+                <a href="{{ url_for('servicos') }}"
+                   {% if request.endpoint in ['servicos', 'novo_servico', 'editar_servico', 'excluir_servico'] %}class="active" aria-current="page"{% endif %}>Serviços</a>
+                <a href="{{ url_for('contato') }}"
+                   {% if request.endpoint == 'contato' %}class="active" aria-current="page"{% endif %}>Contato</a>
+            </nav>
+        </div>
     </header>
-    <main>
+
+    <main id="conteudo">
         {% block conteudo %}{% endblock %}
     </main>
+
     <footer>
-        <p>© 2026 Pet Shop Amigo Fiel</p>
+        © 2026 Pet Shop Amigo Fiel
     </footer>
 </body>
 </html>

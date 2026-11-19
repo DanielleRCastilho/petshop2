@@ -1,16 +1,31 @@
 {% extends "base.html" %}
-{% block titulo %}Pet{% endblock %}
+
+{% block titulo %}Detalhes do pet{% endblock %}
+
 {% block conteudo %}
-{% if pet %}
-<h2>{{ pet.nome }}</h2>
-<p>Raça: {{ pet.raca or '' }}</p>
-<p>Dono: {{ pet.dono }}</p>
-<a href="/pet/{{ pet.id }}/editar">Editar</a>
-<form method="post" action="/pet/{{ pet.id }}/excluir" onsubmit="return confirm('Excluir este pet?')">
-<button type="submit">Excluir</button>
-</form>
-{% else %}
-<p>Pet não encontrado.</p>
-{% endif %}
-<a href="/pets">Voltar</a>
+<section class="card">
+    {% if pet %}
+    <h1>{{ pet.nome }}</h1>
+
+    <p><strong>Raça:</strong> {{ pet.raca or 'Não informada' }}</p>
+    <p><strong>Dono:</strong> {{ pet.dono }}</p>
+
+    <div class="actions">
+        <a class="button"
+           href="{{ url_for('editar_pet', id=pet.id) }}">Editar</a>
+
+        <form method="post"
+              action="{{ url_for('excluir_pet', id=pet.id) }}"
+              onsubmit="return confirm('Excluir este pet?')">
+            <button class="button-danger" type="submit">Excluir</button>
+        </form>
+
+        <a class="button button-secondary"
+           href="{{ url_for('lista_pets') }}">Voltar</a>
+    </div>
+    {% else %}
+    <h1>Pet não encontrado</h1>
+    <a class="button" href="{{ url_for('lista_pets') }}">Voltar</a>
+    {% endif %}
+</section>
 {% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block titulo %}Serviços{% endblock %}
+
+{% block conteudo %}
+<section class="card">
+    <div class="page-title">
+        <h1>Serviços cadastrados</h1>
+        <a class="button" href="{{ url_for('novo_servico') }}">Novo serviço</a>
+    </div>
+
+    <p>Tipos de serviço: banho, tosa, consultas e cuidados gerais.</p>
+
+    {% if servicos %}
+    <ul class="list">
+        {% for s in servicos %}
+        <li>
+            <div><strong>{{ s.tipo }}</strong></div>
+            <div>
+                <span>Data: {{ s.data }}</span><br>
+                <span>Pet: {{ s.pet }}</span>
+            </div>
+            <div class="actions">
+                <span>
+                    {% if s.preco is not none %}
+                    R$ {{ '%.2f'|format(s.preco)|replace('.', ',') }}
+                    {% else %}
+                    Preço não informado
+                    {% endif %}
+                </span>
+                <a class="button button-secondary"
+                   href="{{ url_for('editar_servico', id=s.id) }}">Editar</a>
+                <form method="post"
+                      action="{{ url_for('excluir_servico', id=s.id) }}"
+                      onsubmit="return confirm('Excluir este serviço?')">
+                    <button class="button-danger" type="submit">Excluir</button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state">
+        <p class="empty">Nenhum serviço cadastrado ainda.</p>
+        <a class="button" href="{{ url_for('novo_servico') }}">Cadastrar primeiro serviço</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

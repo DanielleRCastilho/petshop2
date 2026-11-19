@@ -1,11 +1,49 @@
 {% extends "base.html" %}
-{% block titulo %}Novo dono{% endblock %}
+
+{% block titulo %}{{ 'Editar dono' if dono else 'Novo dono' }}{% endblock %}
+
 {% block conteudo %}
-<h2>Novo dono</h2>
-<form method="post">
-<p><label>Nome: <input type="text" name="nome" required></label></p>
-<p><label>Telefone: <input type="text" name="tel"></label></p>
-<p><label>Email: <input type="email" name="email"></label></p>
-<button type="submit">Salvar</button>
-</form>
+<section class="card">
+    <h1>{{ 'Editar dono' if dono else 'Novo dono' }}</h1>
+    <p class="form-note"><span class="required-mark">*</span> Campo obrigatório.</p>
+
+    <form class="form" method="post">
+        <div class="field">
+            <label for="nome">Nome <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="nome"
+                   type="text"
+                   name="nome"
+                   autocomplete="name"
+                   placeholder="Ex.: Maria Silva"
+                   value="{{ dono.nome if dono else '' }}"
+                   required>
+        </div>
+
+        <div class="field">
+            <label for="tel">Telefone</label>
+            <input id="tel"
+                   type="text"
+                   name="tel"
+                   autocomplete="tel"
+                   placeholder="(00) 00000-0000"
+                   value="{{ dono.tel if dono and dono.tel else '' }}">
+        </div>
+
+        <div class="field">
+            <label for="email">Email</label>
+            <input id="email"
+                   type="email"
+                   name="email"
+                   autocomplete="email"
+                   placeholder="voce@exemplo.com"
+                   value="{{ dono.email if dono and dono.email else '' }}">
+        </div>
+
+        <div class="actions">
+            <button type="submit">Salvar</button>
+            <a class="button button-secondary"
+               href="{{ url_for('lista_donos') }}">Cancelar</a>
+        </div>
+    </form>
+</section>
 {% endblock %}

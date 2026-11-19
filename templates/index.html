@@ -1,6 +1,57 @@
 {% extends "base.html" %}
+
 {% block titulo %}Início{% endblock %}
+
 {% block conteudo %}
-<h2>Bem-vindo!</h2>
-<p>Banho, tosa e consultas para o seu pet.</p>
+<section class="hero" aria-labelledby="boas-vindas">
+    <div class="hero-copy">
+        <p class="eyebrow">Cuidado, carinho e confiança</p>
+        <h1 id="boas-vindas">Seu melhor amigo merece cuidado especial.</h1>
+        <p>
+            Conheça nossos serviços e mantenha as informações dos seus pets
+            organizadas em um só lugar.
+        </p>
+
+        <div class="actions">
+            <a class="button" href="{{ url_for('novo_pet') }}">Cadastrar pet</a>
+            <a class="button button-light"
+               href="{{ url_for('servicos') }}">Conhecer serviços</a>
+        </div>
+    </div>
+
+    <aside class="hero-panel" aria-label="Pet Shop Amigo Fiel">
+        <span class="hero-mark" aria-hidden="true">AF</span>
+        <p class="hero-panel-label">Pet Shop</p>
+        <h2>Amigo Fiel</h2>
+        <p>Um espaço feito para cuidar de quem faz parte da família.</p>
+    </aside>
+</section>
+
+<section class="home-section" aria-labelledby="atalhos-titulo">
+    <div class="section-heading">
+        <p class="eyebrow">Acesse rapidamente</p>
+        <h2 id="atalhos-titulo">O que você procura?</h2>
+    </div>
+
+    <div class="shortcut-grid">
+        <a class="shortcut-card" href="{{ url_for('lista_pets') }}">
+            <span class="shortcut-number">01</span>
+            <strong>Pets</strong>
+            <span>Consulte e gerencie os pets cadastrados.</span>
+            <span class="shortcut-link">Ver pets <span aria-hidden="true">→</span></span>
+        </a>
+        <a class="shortcut-card" href="{{ url_for('lista_donos') }}">
+            <span class="shortcut-number">02</span>
+            <strong>Donos</strong>
+            <span>Organize os dados dos responsáveis.</span>
+            <span class="shortcut-link">Ver donos <span aria-hidden="true">→</span></span>
+        </a>
+        <a class="shortcut-card" href="{{ url_for('servicos') }}">
+            <span class="shortcut-number">03</span>
+            <strong>Serviços</strong>
+            <span>Acompanhe os serviços registrados para cada pet.</span>
+            <span class="shortcut-link">Ver serviços <span aria-hidden="true">→</span></span>
+        </a>
+    </div>
+</section>
 {% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ 'Editar serviço' if servico else 'Novo serviço' }}{% endblock %}
+
+{% block conteudo %}
+<section class="card">
+    <h1>{{ 'Editar serviço' if servico else 'Novo serviço' }}</h1>
+
+    {% if pets %}
+    <p class="form-note"><span class="required-mark">*</span> Campo obrigatório.</p>
+    <form class="form" method="post">
+        <div class="field">
+            <label for="tipo">Tipo de serviço <span class="required-mark" aria-hidden="true">*</span></label>
+            <select id="tipo" name="tipo" required>
+                {% for tipo in ['Banho', 'Tosa', 'Consultas', 'Cuidados gerais'] %}
+                <option value="{{ tipo }}"
+                        {% if servico and servico.tipo == tipo %}selected{% endif %}>
+                    {{ tipo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="data">Data <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="data"
+                   type="date"
+                   name="data"
+                   value="{{ servico.data if servico else '' }}"
+                   required>
+        </div>
+
+        <div class="field">
+            <label for="preco">Preço</label>
+            <input id="preco"
+                   type="number"
+                   name="preco"
+                   min="0"
+                   step="0.01"
+                   value="{{ servico.preco if servico and servico.preco is not none else '' }}">
+        </div>
+
+        <div class="field">
+            <label for="pet_id">Pet <span class="required-mark" aria-hidden="true">*</span></label>
+            <select id="pet_id" name="pet_id" required>
+                {% for pet in pets %}
+                <option value="{{ pet.id }}"
+                        {% if servico and servico.pet_id == pet.id %}selected{% endif %}>
+                    {{ pet.nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="actions">
+            <button type="submit">Salvar</button>
+            <a class="button button-secondary"
+               href="{{ url_for('servicos') }}">Cancelar</a>
+        </div>
+    </form>
+    {% else %}
+    <p>Cadastre um pet antes de registrar um serviço.</p>
+    <a class="button" href="{{ url_for('novo_pet') }}">Cadastrar pet</a>
+    <a class="button button-secondary"
+       href="{{ url_for('servicos') }}">Voltar</a>
+    {% endif %}
+</section>
+{% endblock %}
