@@ -1,7 +1,14 @@
+import os
+
 from flask import Flask, abort, render_template, request, redirect, url_for
 import db_sql
 app = Flask(__name__)
 db_sql.init_app(app)
+
+db_path = os.path.join(app.root_path, "petshop.db")
+if not os.path.exists(db_path):
+    with app.app_context():
+        db_sql.init_db()
 
 @app.route("/")
 def index():
