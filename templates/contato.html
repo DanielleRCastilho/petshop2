@@ -1,7 +1,27 @@
 {% extends "base.html" %}
+
 {% block titulo %}Contato{% endblock %}
+
 {% block conteudo %}
-<h2>Contato</h2>
-<p>Telefone: (11) 99999-9999</p>
-<p>Email: contato@amigofiel.com</p>
+<section class="card">
+    <h1>Contato</h1>
+
+    <div class="info-grid">
+        <div class="info-card">
+            <strong>Telefone</strong>
+            (11) 99999-9999
+        </div>
+
+        <div class="info-card">
+            <strong>Email</strong>
+            contato@amigofiel.com
+        </div>
+
+        <div class="info-card">
+            <strong>Horário</strong>
+            Segunda a sábado<br>
+            Das 8h às 18h
+        </div>
+    </div>
+</section>
 {% endblock %}
