@@ -12,16 +12,24 @@
     <p>Tipos de serviço: banho, tosa, consultas e cuidados gerais.</p>
 
     {% if servicos %}
-    <ul class="list">
+    <div class="record-grid">
         {% for s in servicos %}
-        <li>
-            <div><strong>{{ s.tipo }}</strong></div>
-            <div>
-                <span>Data: {{ s.data }}</span><br>
+        <article class="record-card">
+            <div class="record-card-heading">
+                <strong class="record-title">{{ s.tipo }}</strong>
+                <span class="status-badge
+                    {% if s.status == 'Agendado' %}status-scheduled
+                    {% elif s.status == 'Em andamento' %}status-in-progress
+                    {% elif s.status == 'Concluído' %}status-completed{% endif %}">
+                    {{ s.status }}
+                </span>
+            </div>
+            <div class="record-details">
+                <span>Data: {{ s.data }}</span>
                 <span>Pet: {{ s.pet }}</span>
             </div>
-            <div class="actions">
-                <span>
+            <div class="actions record-actions">
+                <span class="record-price">
                     {% if s.preco is not none %}
                     R$ {{ '%.2f'|format(s.preco)|replace('.', ',') }}
                     {% else %}
@@ -32,13 +40,13 @@
                    href="{{ url_for('editar_servico', id=s.id) }}">Editar</a>
                 <form method="post"
                       action="{{ url_for('excluir_servico', id=s.id) }}"
-                      onsubmit="return confirm('Excluir este serviço?')">
+                      onsubmit="return confirm('Excluir este serviço? Esta ação não pode ser desfeita.')">
                     <button class="button-danger" type="submit">Excluir</button>
                 </form>
             </div>
-        </li>
+        </article>
         {% endfor %}
-    </ul>
+    </div>
     {% else %}
     <div class="empty-state">
         <p class="empty">Nenhum serviço cadastrado ainda.</p>

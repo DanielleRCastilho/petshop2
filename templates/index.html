@@ -11,7 +11,6 @@
             Conheça nossos serviços e mantenha as informações dos seus pets
             organizadas em um só lugar.
         </p>
-
         <div class="actions">
             <a class="button" href="{{ url_for('novo_pet') }}">Cadastrar pet</a>
             <a class="button button-light"
@@ -19,38 +18,44 @@
         </div>
     </div>
 
-    <aside class="hero-panel" aria-label="Pet Shop Amigo Fiel">
-        <span class="hero-mark" aria-hidden="true">AF</span>
-        <p class="hero-panel-label">Pet Shop</p>
-        <h2>Amigo Fiel</h2>
-        <p>Um espaço feito para cuidar de quem faz parte da família.</p>
-    </aside>
+    <div class="hero-art" aria-hidden="true">
+        <span class="hero-spark hero-spark-one"></span>
+        <span class="hero-spark hero-spark-two"></span>
+        <div class="hero-medallion">
+            <svg viewBox="0 0 100 100" focusable="false">
+                <ellipse cx="50" cy="65" rx="25" ry="19"></ellipse>
+                <ellipse cx="23" cy="39" rx="9" ry="13" transform="rotate(-25 23 39)"></ellipse>
+                <ellipse cx="42" cy="27" rx="9" ry="13" transform="rotate(-8 42 27)"></ellipse>
+                <ellipse cx="61" cy="27" rx="9" ry="13" transform="rotate(8 61 27)"></ellipse>
+                <ellipse cx="78" cy="39" rx="9" ry="13" transform="rotate(25 78 39)"></ellipse>
+            </svg>
+        </div>
+        <span class="hero-note hero-note-top">Amor de quatro patas</span>
+        <span class="hero-note hero-note-bottom">Cuidado de verdade</span>
+    </div>
 </section>
 
-<section class="home-section" aria-labelledby="atalhos-titulo">
+<section class="home-section" aria-labelledby="resumo-titulo">
     <div class="section-heading">
-        <p class="eyebrow">Acesse rapidamente</p>
-        <h2 id="atalhos-titulo">O que você procura?</h2>
+        <p class="eyebrow">Seu espaço pet</p>
+        <h2 id="resumo-titulo">Visão geral</h2>
     </div>
 
-    <div class="shortcut-grid">
-        <a class="shortcut-card" href="{{ url_for('lista_pets') }}">
-            <span class="shortcut-number">01</span>
-            <strong>Pets</strong>
-            <span>Consulte e gerencie os pets cadastrados.</span>
-            <span class="shortcut-link">Ver pets <span aria-hidden="true">→</span></span>
+    <div class="summary-grid">
+        <a class="summary-card" href="{{ url_for('lista_pets') }}">
+            <span class="summary-label">Pets cadastrados</span>
+            <strong class="summary-count">{{ resumo.pets }}</strong>
+            <span class="summary-link">Ver pets <span aria-hidden="true">→</span></span>
         </a>
-        <a class="shortcut-card" href="{{ url_for('lista_donos') }}">
-            <span class="shortcut-number">02</span>
-            <strong>Donos</strong>
-            <span>Organize os dados dos responsáveis.</span>
-            <span class="shortcut-link">Ver donos <span aria-hidden="true">→</span></span>
+        <a class="summary-card" href="{{ url_for('lista_donos') }}">
+            <span class="summary-label">Donos cadastrados</span>
+            <strong class="summary-count">{{ resumo.donos }}</strong>
+            <span class="summary-link">Ver donos <span aria-hidden="true">→</span></span>
         </a>
-        <a class="shortcut-card" href="{{ url_for('servicos') }}">
-            <span class="shortcut-number">03</span>
-            <strong>Serviços</strong>
-            <span>Acompanhe os serviços registrados para cada pet.</span>
-            <span class="shortcut-link">Ver serviços <span aria-hidden="true">→</span></span>
+        <a class="summary-card" href="{{ url_for('servicos') }}">
+            <span class="summary-label">Serviços registrados</span>
+            <strong class="summary-count">{{ resumo.servicos }}</strong>
+            <span class="summary-link">Ver serviços <span aria-hidden="true">→</span></span>
         </a>
     </div>
 </section>

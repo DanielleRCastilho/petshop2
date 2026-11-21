@@ -1,18 +1,19 @@
 import os
 
-from flask import Flask, abort, render_template, request, redirect, url_for
+from flask import Flask, abort, flash, render_template, request, redirect, url_for
 import db_sql
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.environ.get("PETSHOP_SECRET_KEY") or os.urandom(32)
 db_sql.init_app(app)
 
-db_path = os.path.join(app.root_path, "petshop.db")
-if not os.path.exists(db_path):
-    with app.app_context():
-        db_sql.init_db()
+STATUS_SERVICOS = ("Agendado", "Em andamento", "Concluído")
+
+with app.app_context():
+    db_sql.init_db()
 
 @app.route("/")
 def index():
-   return render_template("index.html")
+   return render_template("index.html", resumo=db_sql.contar_registros())
 
 @app.route("/sobre")
 def sobre():
@@ -28,15 +29,23 @@ def novo_servico():
    if request.method == "POST":
        if not pets:
            abort(400, description="Cadastre um pet antes de registrar um serviço.")
+       status = request.form.get("status")
+       if status not in STATUS_SERVICOS:
+           abort(400, description="Selecione um status válido para o serviço.")
        db_sql.inserir_servico(
            request.form["tipo"],
            request.form["data"],
            request.form["preco"] or None,
            request.form["pet_id"],
+           status,
        )
+       flash("Serviço cadastrado com sucesso.", "success")
        return redirect(url_for("servicos"))
    return render_template(
-       "form_servico.html", servico=None, pets=pets
+       "form_servico.html",
+       servico=None,
+       pets=pets,
+       status_servicos=STATUS_SERVICOS,
    )
 
 @app.route("/servico/<int:id>/editar", methods=["GET", "POST"])
@@ -46,21 +55,32 @@ def editar_servico(id):
        abort(404)
    pets = db_sql.listar_pets()
    if request.method == "POST":
+       status = request.form.get("status")
+       if status not in STATUS_SERVICOS:
+           abort(400, description="Selecione um status válido para o serviço.")
        db_sql.atualizar_servico(
            id,
            request.form["tipo"],
            request.form["data"],
            request.form["preco"] or None,
            request.form["pet_id"],
+           status,
        )
+       flash("Serviço atualizado com sucesso.", "success")
        return redirect(url_for("servicos"))
-   return render_template("form_servico.html", servico=servico, pets=pets)
+   return render_template(
+       "form_servico.html",
+       servico=servico,
+       pets=pets,
+       status_servicos=STATUS_SERVICOS,
+   )
 
 @app.route("/servico/<int:id>/excluir", methods=["POST"])
 def excluir_servico(id):
    if db_sql.buscar_servico(id) is None:
        abort(404)
    db_sql.excluir_servico(id)
+   flash("Serviço excluído com sucesso.", "success")
    return redirect(url_for("servicos"))
 
 @app.route("/contato")
@@ -79,6 +99,7 @@ def novo_dono():
            request.form["tel"],
            request.form["email"] or None,
        )
+       flash("Dono cadastrado com sucesso.", "success")
        return redirect(url_for("lista_donos"))
    return render_template("form_dono.html", dono=None)
 
@@ -94,6 +115,7 @@ def editar_dono(id):
            request.form["tel"],
            request.form["email"] or None,
        )
+       flash("Dono atualizado com sucesso.", "success")
        return redirect(url_for("lista_donos"))
    return render_template("form_dono.html", dono=dono)
 
@@ -102,6 +124,7 @@ def excluir_dono(id):
    if db_sql.buscar_dono(id) is None:
        abort(404)
    db_sql.excluir_dono(id)
+   flash("Dono e dados vinculados excluídos com sucesso.", "success")
    return redirect(url_for("lista_donos"))
 
 @app.route("/pets")
@@ -120,6 +143,7 @@ def novo_pet():
            request.form["raca"],
            request.form["dono_id"],
        )
+       flash("Pet cadastrado com sucesso.", "success")
        return redirect(url_for("lista_pets"))
    return render_template("form_pet.html", pet=None, donos=db_sql.listar_donos())
 
@@ -135,6 +159,7 @@ def editar_pet(id):
            request.form["raca"],
            request.form["dono_id"],
        )
+       flash("Pet atualizado com sucesso.", "success")
        return redirect(url_for("pet", id=id))
    return render_template(
        "form_pet.html", pet=pet, donos=db_sql.listar_donos()
@@ -145,6 +170,7 @@ def excluir_pet(id):
    if db_sql.buscar_pet(id) is None:
        abort(404)
    db_sql.excluir_pet(id)
+   flash("Pet e serviços vinculados excluídos com sucesso.", "success")
    return redirect(url_for("lista_pets"))
 
 if __name__ == "__main__":

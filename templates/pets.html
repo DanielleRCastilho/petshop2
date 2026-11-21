@@ -10,12 +10,13 @@
     </div>
 
     {% if pets %}
-    <div class="pet-list">
+    <div class="record-grid">
         {% for p in pets %}
-        <a class="pet-card" href="{{ url_for('pet', id=p.id) }}">
-            <strong>{{ p.nome }}</strong>
-            Raça: {{ p.raca or 'Não informada' }}<br>
-            Dono: {{ p.dono }}
+        <a class="record-card" href="{{ url_for('pet', id=p.id) }}">
+            <strong class="record-title">{{ p.nome }}</strong>
+            <span class="record-detail">Raça: {{ p.raca or 'Não informada' }}</span>
+            <span class="record-detail">Dono: {{ p.dono }}</span>
+            <span class="record-link">Ver detalhes <span aria-hidden="true">→</span></span>
         </a>
         {% endfor %}
     </div>

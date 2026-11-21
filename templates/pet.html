@@ -16,7 +16,7 @@
 
         <form method="post"
               action="{{ url_for('excluir_pet', id=pet.id) }}"
-              onsubmit="return confirm('Excluir este pet?')">
+              onsubmit="return confirm('Excluir este pet e os serviços vinculados? Esta ação não pode ser desfeita.')">
             <button class="button-danger" type="submit">Excluir</button>
         </form>
 

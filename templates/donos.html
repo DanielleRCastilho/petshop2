@@ -10,15 +10,15 @@
     </div>
 
     {% if donos %}
-    <ul class="list">
+    <div class="record-grid">
         {% for d in donos %}
-        <li>
-            <div><strong>{{ d.nome }}</strong></div>
-            <div>
-                <span>{{ d.tel or 'Telefone não informado' }}</span><br>
+        <article class="record-card">
+            <strong class="record-title">{{ d.nome }}</strong>
+            <div class="record-details">
+                <span>{{ d.tel or 'Telefone não informado' }}</span>
                 <span>{{ d.email or 'Email não informado' }}</span>
             </div>
-            <div class="actions">
+            <div class="actions record-actions">
                 <a class="button button-secondary"
                    href="{{ url_for('editar_dono', id=d.id) }}">Editar</a>
                 <form method="post"
@@ -27,9 +27,9 @@
                     <button class="button-danger" type="submit">Excluir</button>
                 </form>
             </div>
-        </li>
+        </article>
         {% endfor %}
-    </ul>
+    </div>
     {% else %}
     <div class="empty-state">
         <p class="empty">Nenhum dono cadastrado ainda.</p>

@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block titulo %}Pet Shop Amigo Fiel{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
@@ -43,6 +47,15 @@
     </header>
 
     <main id="conteudo">
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+        <div class="flash-stack" aria-live="polite">
+            {% for categoria, mensagem in mensagens %}
+            <div class="flash flash-{{ categoria }}" role="status">{{ mensagem }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
         {% block conteudo %}{% endblock %}
     </main>
 

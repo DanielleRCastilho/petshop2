@@ -22,6 +22,18 @@
         </div>
 
         <div class="field">
+            <label for="status">Status <span class="required-mark" aria-hidden="true">*</span></label>
+            <select id="status" name="status" required>
+                {% for status in status_servicos %}
+                <option value="{{ status }}"
+                        {% if servico and servico.status == status %}selected{% elif not servico and status == 'Agendado' %}selected{% endif %}>
+                    {{ status }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field">
             <label for="data">Data <span class="required-mark" aria-hidden="true">*</span></label>
             <input id="data"
                    type="date"

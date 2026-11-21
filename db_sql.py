@@ -11,6 +11,14 @@ def get_db():
        g.db.execute("PRAGMA foreign_keys = ON")
    return g.db
 
+def contar_registros():
+   return get_db().execute(
+       "SELECT "
+       "(SELECT COUNT(*) FROM donos) AS donos, "
+       "(SELECT COUNT(*) FROM pets) AS pets, "
+       "(SELECT COUNT(*) FROM servicos) AS servicos"
+   ).fetchone()
+
 def close_db(e=None):
    db = g.pop("db", None)
    if db is not None:
@@ -21,6 +29,15 @@ def init_db():
    caminho = os.path.join(current_app.root_path, "schema.sql")
    with open(caminho, encoding="utf-8") as f:
        db.executescript(f.read())
+   colunas_servicos = {
+       coluna["name"] for coluna in db.execute("PRAGMA table_info(servicos)")
+   }
+   if "status" not in colunas_servicos:
+       db.execute(
+           "ALTER TABLE servicos "
+           "ADD COLUMN status TEXT NOT NULL DEFAULT 'Agendado'"
+       )
+       db.commit()
 
 @click.command("init-db")
 def init_db_command():
@@ -99,19 +116,19 @@ def excluir_pet(id):
    db.execute("DELETE FROM pets WHERE id = ?", (id,))
    db.commit()
 
-def inserir_servico(tipo, data, preco, pet_id):
+def inserir_servico(tipo, data, preco, pet_id, status):
    db = get_db()
    db.execute(
-       "INSERT INTO servicos (tipo, data, preco, pet_id) "
-       "VALUES (?, ?, ?, ?)",
-       (tipo, data, preco, pet_id),
+       "INSERT INTO servicos (tipo, data, preco, pet_id, status) "
+       "VALUES (?, ?, ?, ?, ?)",
+       (tipo, data, preco, pet_id, status),
    )
    db.commit()
 
 def listar_servicos():
    return get_db().execute(
        "SELECT servicos.id, servicos.tipo, servicos.data, servicos.preco, "
-       "servicos.pet_id, pets.nome AS pet "
+       "servicos.pet_id, servicos.status, pets.nome AS pet "
        "FROM servicos INNER JOIN pets ON servicos.pet_id = pets.id "
        "ORDER BY servicos.data DESC, servicos.id DESC"
    ).fetchall()
@@ -119,18 +136,19 @@ def listar_servicos():
 def buscar_servico(id):
    return get_db().execute(
        "SELECT servicos.id, servicos.tipo, servicos.data, servicos.preco, "
-       "servicos.pet_id, pets.nome AS pet "
+       "servicos.pet_id, servicos.status, pets.nome AS pet "
        "FROM servicos INNER JOIN pets ON servicos.pet_id = pets.id "
        "WHERE servicos.id = ?",
        (id,),
    ).fetchone()
 
-def atualizar_servico(id, tipo, data, preco, pet_id):
+def atualizar_servico(id, tipo, data, preco, pet_id, status):
    db = get_db()
    db.execute(
-       "UPDATE servicos SET tipo = ?, data = ?, preco = ?, pet_id = ? "
+       "UPDATE servicos SET tipo = ?, data = ?, preco = ?, pet_id = ?, "
+       "status = ? "
        "WHERE id = ?",
-       (tipo, data, preco, pet_id, id),
+       (tipo, data, preco, pet_id, status, id),
    )
    db.commit()
 

@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS servicos (
    tipo TEXT NOT NULL,
    data TEXT NOT NULL,
    preco REAL,
+   status TEXT NOT NULL DEFAULT 'Agendado',
    pet_id INTEGER NOT NULL,
    FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE
 );
