@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS donos (
    id INTEGER PRIMARY KEY AUTOINCREMENT,
    nome TEXT NOT NULL,
-   tel TEXT,
+   tel TEXT NOT NULL,
    email TEXT UNIQUE
 );
 CREATE TABLE IF NOT EXISTS pets (
@@ -13,10 +13,12 @@ CREATE TABLE IF NOT EXISTS pets (
 );
 CREATE TABLE IF NOT EXISTS servicos (
    id INTEGER PRIMARY KEY AUTOINCREMENT,
-   tipo TEXT NOT NULL,
+   tipo TEXT NOT NULL
+       CHECK (tipo IN ('Banho', 'Tosa', 'Consultas', 'Cuidados gerais')),
    data TEXT NOT NULL,
-   preco REAL,
-   status TEXT NOT NULL DEFAULT 'Agendado',
+   preco REAL CHECK (preco IS NULL OR preco >= 0),
+   status TEXT NOT NULL DEFAULT 'Agendado'
+       CHECK (status IN ('Agendado', 'Em andamento', 'Concluído')),
    pet_id INTEGER NOT NULL,
    FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE
 );

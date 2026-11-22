@@ -12,7 +12,7 @@
         <div class="field">
             <label for="tipo">Tipo de serviço <span class="required-mark" aria-hidden="true">*</span></label>
             <select id="tipo" name="tipo" required>
-                {% for tipo in ['Banho', 'Tosa', 'Consultas', 'Cuidados gerais'] %}
+                {% for tipo in tipos_servicos %}
                 <option value="{{ tipo }}"
                         {% if servico and servico.tipo == tipo %}selected{% endif %}>
                     {{ tipo }}

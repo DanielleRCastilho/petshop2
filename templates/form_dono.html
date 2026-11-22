@@ -20,13 +20,14 @@
         </div>
 
         <div class="field">
-            <label for="tel">Telefone</label>
+            <label for="tel">Telefone <span class="required-mark" aria-hidden="true">*</span></label>
             <input id="tel"
                    type="text"
                    name="tel"
                    autocomplete="tel"
                    placeholder="(00) 00000-0000"
-                   value="{{ dono.tel if dono and dono.tel else '' }}">
+                   value="{{ dono.tel if dono and dono.tel else '' }}"
+                   required>
         </div>
 
         <div class="field">

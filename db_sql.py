@@ -5,7 +5,10 @@ from flask import current_app, g
 
 def get_db():
    if "db" not in g:
-       caminho = os.path.join(current_app.root_path, "petshop.db")
+       caminho = current_app.config.get(
+           "SQL_DATABASE",
+           os.path.join(current_app.root_path, "petshop.db"),
+       )
        g.db = sqlite3.connect(caminho)
        g.db.row_factory = sqlite3.Row
        g.db.execute("PRAGMA foreign_keys = ON")
@@ -20,6 +23,7 @@ def contar_registros():
    ).fetchone()
 
 def close_db(e=None):
+   _ = e
    db = g.pop("db", None)
    if db is not None:
        db.close()

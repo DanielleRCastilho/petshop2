@@ -1,42 +1,95 @@
 import os
+import sqlite3
+from datetime import date
 
 from flask import Flask, abort, flash, render_template, request, redirect, url_for
 import db_sql
-app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("PETSHOP_SECRET_KEY") or os.urandom(32)
-db_sql.init_app(app)
 
+TIPOS_SERVICOS = ("Banho", "Tosa", "Consultas", "Cuidados gerais")
 STATUS_SERVICOS = ("Agendado", "Em andamento", "Concluído")
 
-with app.app_context():
-    db_sql.init_db()
 
-@app.route("/")
+def create_app(test_config=None):
+   app = Flask(__name__)
+   app.config["SECRET_KEY"] = os.environ.get("PETSHOP_SECRET_KEY") or os.urandom(32)
+   app.config["SQL_DATABASE"] = os.path.join(app.root_path, "petshop.db")
+
+   if test_config:
+       app.config.update(test_config)
+
+   db_sql.init_app(app)
+   _register_routes(app)
+   with app.app_context():
+       db_sql.init_db()
+   return app
+
+
+def campo_obrigatorio(nome, campo=""):
+   valor = (campo or "").strip()
+   if not valor:
+       abort(400, description=f"O campo {nome} é obrigatório.")
+   return valor
+
+
+def validar_data(valor):
+   valor = campo_obrigatorio("Data", valor)
+   try:
+       date.fromisoformat(valor)
+   except ValueError:
+       abort(400, description="Informe uma data válida.")
+   return valor
+
+
+def validar_preco(valor):
+   if not (valor or "").strip():
+       return None
+   try:
+       preco = float(valor)
+   except ValueError:
+       abort(400, description="Informe um preço válido.")
+   if preco < 0:
+       abort(400, description="O preço não pode ser negativo.")
+   return preco
+
+
+def validar_id(valor, nome, busca):
+   try:
+       id = int(valor)
+   except (TypeError, ValueError):
+       abort(400, description=f"Selecione um {nome} válido.")
+   if busca(id) is None:
+       abort(400, description=f"Selecione um {nome} válido.")
+   return id
+
+
 def index():
    return render_template("index.html", resumo=db_sql.contar_registros())
 
-@app.route("/sobre")
 def sobre():
    return render_template("sobre.html")
 
-@app.route("/servicos")
 def servicos():
    return render_template("servicos.html", servicos=db_sql.listar_servicos())
 
-@app.route("/servicos/novo", methods=["GET", "POST"])
 def novo_servico():
    pets = db_sql.listar_pets()
    if request.method == "POST":
        if not pets:
            abort(400, description="Cadastre um pet antes de registrar um serviço.")
+       tipo = campo_obrigatorio("Tipo de serviço", request.form.get("tipo"))
+       if tipo not in TIPOS_SERVICOS:
+           abort(400, description="Selecione um tipo de serviço válido.")
        status = request.form.get("status")
        if status not in STATUS_SERVICOS:
            abort(400, description="Selecione um status válido para o serviço.")
+       data = validar_data(request.form.get("data"))
+       preco = validar_preco(request.form.get("preco"))
+       pet_id = validar_id(request.form.get("pet_id"), "pet", db_sql.buscar_pet)
        db_sql.inserir_servico(
-           request.form["tipo"],
-           request.form["data"],
-           request.form["preco"] or None,
-           request.form["pet_id"],
+           tipo,
+           data,
+           preco,
+           pet_id,
            status,
        )
        flash("Serviço cadastrado com sucesso.", "success")
@@ -45,25 +98,31 @@ def novo_servico():
        "form_servico.html",
        servico=None,
        pets=pets,
+       tipos_servicos=TIPOS_SERVICOS,
        status_servicos=STATUS_SERVICOS,
    )
 
-@app.route("/servico/<int:id>/editar", methods=["GET", "POST"])
 def editar_servico(id):
    servico = db_sql.buscar_servico(id)
    if servico is None:
        abort(404)
    pets = db_sql.listar_pets()
    if request.method == "POST":
+       tipo = campo_obrigatorio("Tipo de serviço", request.form.get("tipo"))
+       if tipo not in TIPOS_SERVICOS:
+           abort(400, description="Selecione um tipo de serviço válido.")
        status = request.form.get("status")
        if status not in STATUS_SERVICOS:
            abort(400, description="Selecione um status válido para o serviço.")
+       data = validar_data(request.form.get("data"))
+       preco = validar_preco(request.form.get("preco"))
+       pet_id = validar_id(request.form.get("pet_id"), "pet", db_sql.buscar_pet)
        db_sql.atualizar_servico(
            id,
-           request.form["tipo"],
-           request.form["data"],
-           request.form["preco"] or None,
-           request.form["pet_id"],
+           tipo,
+           data,
+           preco,
+           pet_id,
            status,
        )
        flash("Serviço atualizado com sucesso.", "success")
@@ -72,10 +131,10 @@ def editar_servico(id):
        "form_servico.html",
        servico=servico,
        pets=pets,
+       tipos_servicos=TIPOS_SERVICOS,
        status_servicos=STATUS_SERVICOS,
    )
 
-@app.route("/servico/<int:id>/excluir", methods=["POST"])
 def excluir_servico(id):
    if db_sql.buscar_servico(id) is None:
        abort(404)
@@ -83,43 +142,43 @@ def excluir_servico(id):
    flash("Serviço excluído com sucesso.", "success")
    return redirect(url_for("servicos"))
 
-@app.route("/contato")
 def contato():
    return render_template("contato.html")
 
-@app.route("/donos")
 def lista_donos():
    return render_template("donos.html", donos=db_sql.listar_donos())
 
-@app.route("/donos/novo", methods=["GET", "POST"])
 def novo_dono():
    if request.method == "POST":
-       db_sql.inserir_dono(
-           request.form["nome"],
-           request.form["tel"],
-           request.form["email"] or None,
-       )
+       nome = campo_obrigatorio("Nome", request.form.get("nome"))
+       tel = campo_obrigatorio("Telefone", request.form.get("tel"))
+       email = (request.form.get("email") or "").strip() or None
+       try:
+           db_sql.inserir_dono(nome, tel, email)
+       except sqlite3.IntegrityError:
+           flash("Este email já está cadastrado.", "error")
+           return redirect(url_for("novo_dono"))
        flash("Dono cadastrado com sucesso.", "success")
        return redirect(url_for("lista_donos"))
    return render_template("form_dono.html", dono=None)
 
-@app.route("/dono/<int:id>/editar", methods=["GET", "POST"])
 def editar_dono(id):
    dono = db_sql.buscar_dono(id)
    if dono is None:
        abort(404)
    if request.method == "POST":
-       db_sql.atualizar_dono(
-           id,
-           request.form["nome"],
-           request.form["tel"],
-           request.form["email"] or None,
-       )
+       nome = campo_obrigatorio("Nome", request.form.get("nome"))
+       tel = campo_obrigatorio("Telefone", request.form.get("tel"))
+       email = (request.form.get("email") or "").strip() or None
+       try:
+           db_sql.atualizar_dono(id, nome, tel, email)
+       except sqlite3.IntegrityError:
+           flash("Este email já está cadastrado.", "error")
+           return redirect(url_for("editar_dono", id=id))
        flash("Dono atualizado com sucesso.", "success")
        return redirect(url_for("lista_donos"))
    return render_template("form_dono.html", dono=dono)
 
-@app.route("/dono/<int:id>/excluir", methods=["POST"])
 def excluir_dono(id):
    if db_sql.buscar_dono(id) is None:
        abort(404)
@@ -127,37 +186,42 @@ def excluir_dono(id):
    flash("Dono e dados vinculados excluídos com sucesso.", "success")
    return redirect(url_for("lista_donos"))
 
-@app.route("/pets")
 def lista_pets():
    return render_template("pets.html", pets=db_sql.listar_pets())
 
-@app.route("/pet/<int:id>")
 def pet(id):
-   return render_template("pet.html", pet=db_sql.buscar_pet(id))
+   pet = db_sql.buscar_pet(id)
+   if pet is None:
+       abort(404)
+   return render_template("pet.html", pet=pet)
 
-@app.route("/pets/novo", methods=["GET", "POST"])
 def novo_pet():
    if request.method == "POST":
+       nome = campo_obrigatorio("Nome do pet", request.form.get("nome"))
+       raca = (request.form.get("raca") or "").strip() or None
+       dono_id = validar_id(request.form.get("dono_id"), "dono", db_sql.buscar_dono)
        db_sql.inserir_pet(
-           request.form["nome"],
-           request.form["raca"],
-           request.form["dono_id"],
+           nome,
+           raca,
+           dono_id,
        )
        flash("Pet cadastrado com sucesso.", "success")
        return redirect(url_for("lista_pets"))
    return render_template("form_pet.html", pet=None, donos=db_sql.listar_donos())
 
-@app.route("/pet/<int:id>/editar", methods=["GET", "POST"])
 def editar_pet(id):
    pet = db_sql.buscar_pet(id)
    if pet is None:
        abort(404)
    if request.method == "POST":
+       nome = campo_obrigatorio("Nome do pet", request.form.get("nome"))
+       raca = (request.form.get("raca") or "").strip() or None
+       dono_id = validar_id(request.form.get("dono_id"), "dono", db_sql.buscar_dono)
        db_sql.atualizar_pet(
            id,
-           request.form["nome"],
-           request.form["raca"],
-           request.form["dono_id"],
+           nome,
+           raca,
+           dono_id,
        )
        flash("Pet atualizado com sucesso.", "success")
        return redirect(url_for("pet", id=id))
@@ -165,13 +229,35 @@ def editar_pet(id):
        "form_pet.html", pet=pet, donos=db_sql.listar_donos()
    )
 
-@app.route("/pet/<int:id>/excluir", methods=["POST"])
 def excluir_pet(id):
    if db_sql.buscar_pet(id) is None:
        abort(404)
    db_sql.excluir_pet(id)
    flash("Pet e serviços vinculados excluídos com sucesso.", "success")
    return redirect(url_for("lista_pets"))
+
+
+def _register_routes(app):
+   app.add_url_rule("/", view_func=index)
+   app.add_url_rule("/sobre", view_func=sobre)
+   app.add_url_rule("/servicos", view_func=servicos)
+   app.add_url_rule("/servicos/novo", view_func=novo_servico, methods=["GET", "POST"])
+   app.add_url_rule("/servico/<int:id>/editar", view_func=editar_servico, methods=["GET", "POST"])
+   app.add_url_rule("/servico/<int:id>/excluir", view_func=excluir_servico, methods=["POST"])
+   app.add_url_rule("/contato", view_func=contato)
+   app.add_url_rule("/donos", view_func=lista_donos)
+   app.add_url_rule("/donos/novo", view_func=novo_dono, methods=["GET", "POST"])
+   app.add_url_rule("/dono/<int:id>/editar", view_func=editar_dono, methods=["GET", "POST"])
+   app.add_url_rule("/dono/<int:id>/excluir", view_func=excluir_dono, methods=["POST"])
+   app.add_url_rule("/pets", view_func=lista_pets)
+   app.add_url_rule("/pet/<int:id>", view_func=pet)
+   app.add_url_rule("/pets/novo", view_func=novo_pet, methods=["GET", "POST"])
+   app.add_url_rule("/pet/<int:id>/editar", view_func=editar_pet, methods=["GET", "POST"])
+   app.add_url_rule("/pet/<int:id>/excluir", view_func=excluir_pet, methods=["POST"])
+
+
+app = create_app()
+
 
 if __name__ == "__main__":
    app.run(debug=True)

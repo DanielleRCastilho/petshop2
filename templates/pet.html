@@ -4,7 +4,6 @@
 
 {% block conteudo %}
 <section class="card">
-    {% if pet %}
     <h1>{{ pet.nome }}</h1>
 
     <p><strong>Raça:</strong> {{ pet.raca or 'Não informada' }}</p>
@@ -23,9 +22,5 @@
         <a class="button button-secondary"
            href="{{ url_for('lista_pets') }}">Voltar</a>
     </div>
-    {% else %}
-    <h1>Pet não encontrado</h1>
-    <a class="button" href="{{ url_for('lista_pets') }}">Voltar</a>
-    {% endif %}
 </section>
 {% endblock %}
