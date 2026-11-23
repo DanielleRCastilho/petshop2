@@ -42,6 +42,8 @@ def init_db():
            "ADD COLUMN status TEXT NOT NULL DEFAULT 'Agendado'"
        )
        db.commit()
+   db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_donos_tel ON donos(tel)")
+   db.commit()
 
 @click.command("init-db")
 def init_db_command():
@@ -69,6 +71,33 @@ def buscar_dono(id):
    return get_db().execute(
        "SELECT id, nome, tel, email FROM donos WHERE id = ?",
        (id,),
+   ).fetchone()
+
+def buscar_dono_por_telefone(tel, exceto_id=None):
+   numeros = "".join(caractere for caractere in tel if caractere.isdigit())
+   query = "SELECT id, nome, tel, email FROM donos"
+   parametros = ()
+   if exceto_id is not None:
+       query += " WHERE id != ?"
+       parametros = (exceto_id,)
+   for dono in get_db().execute(query, parametros).fetchall():
+       telefone_cadastrado = "".join(
+           caractere for caractere in (dono["tel"] or "") if caractere.isdigit()
+       )
+       if telefone_cadastrado == numeros:
+           return dono
+   return None
+
+def buscar_dono_por_email(email, exceto_id=None):
+   if exceto_id is None:
+       return get_db().execute(
+           "SELECT id, nome, tel, email FROM donos WHERE email = ?",
+           (email,),
+       ).fetchone()
+   return get_db().execute(
+       "SELECT id, nome, tel, email FROM donos "
+       "WHERE email = ? AND id != ?",
+       (email, exceto_id),
    ).fetchone()
 
 def atualizar_dono(id, nome, tel, email):

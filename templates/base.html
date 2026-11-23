@@ -51,7 +51,11 @@
         {% if mensagens %}
         <div class="flash-stack" aria-live="polite">
             {% for categoria, mensagem in mensagens %}
-            <div class="flash flash-{{ categoria }}" role="status">{{ mensagem }}</div>
+            <div class="flash flash-{{ categoria }}"
+                 role="{% if categoria == 'error' %}alert{% else %}status{% endif %}"
+                 aria-live="{% if categoria == 'error' %}assertive{% else %}polite{% endif %}">
+                {{ mensagem }}
+            </div>
             {% endfor %}
         </div>
         {% endif %}

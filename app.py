@@ -153,6 +153,16 @@ def novo_dono():
        nome = campo_obrigatorio("Nome", request.form.get("nome"))
        tel = campo_obrigatorio("Telefone", request.form.get("tel"))
        email = (request.form.get("email") or "").strip() or None
+       if len(tel) > 15:
+           abort(400, description="O telefone deve ter no máximo 15 caracteres.")
+       if email and len(email) > 254:
+           abort(400, description="O email deve ter no máximo 254 caracteres.")
+       if db_sql.buscar_dono_por_telefone(tel):
+           flash("Este telefone já está cadastrado.", "error")
+           return redirect(url_for("novo_dono"))
+       if email and db_sql.buscar_dono_por_email(email):
+           flash("Este email já está cadastrado.", "error")
+           return redirect(url_for("novo_dono"))
        try:
            db_sql.inserir_dono(nome, tel, email)
        except sqlite3.IntegrityError:
@@ -170,6 +180,16 @@ def editar_dono(id):
        nome = campo_obrigatorio("Nome", request.form.get("nome"))
        tel = campo_obrigatorio("Telefone", request.form.get("tel"))
        email = (request.form.get("email") or "").strip() or None
+       if len(tel) > 15:
+           abort(400, description="O telefone deve ter no máximo 15 caracteres.")
+       if email and len(email) > 254:
+           abort(400, description="O email deve ter no máximo 254 caracteres.")
+       if db_sql.buscar_dono_por_telefone(tel, exceto_id=id):
+           flash("Este telefone já está cadastrado.", "error")
+           return redirect(url_for("editar_dono", id=id))
+       if email and db_sql.buscar_dono_por_email(email, exceto_id=id):
+           flash("Este email já está cadastrado.", "error")
+           return redirect(url_for("editar_dono", id=id))
        try:
            db_sql.atualizar_dono(id, nome, tel, email)
        except sqlite3.IntegrityError:
