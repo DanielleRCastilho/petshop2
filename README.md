@@ -1,7 +1,8 @@
 # Pet Shop Amigo Fiel
 
 Aplicação web em Flask para cadastrar pets, donos e serviços.
-Os serviços podem ser acompanhados pelos status Agendado, Em andamento e Concluído.
+Os serviços são organizados por data e horário e podem ser acompanhados pelos
+status Agendado, Em andamento e Concluído.
 
 ## Executar localmente
 
@@ -34,5 +35,6 @@ venv\Scripts\flask.exe --app app init-db
 - Chaves primárias, chaves estrangeiras e exclusão em cascata.
 - Script SQL completo em `schema.sql` e persistência SQLite em `petshop.db`.
 - CRUD para donos, pets e serviços, com consultas SQL nativas.
+- Informações de contato editáveis e salvas no banco de dados.
 - Separação entre interface Flask, templates Jinja e acesso ao banco em `db_sql.py`.
 - Aplicação organizada pela fábrica `create_app(test_config=None)`.

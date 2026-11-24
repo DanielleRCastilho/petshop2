@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block titulo %}Serviços{% endblock %}
+{% block titulo %}Agenda de serviços{% endblock %}
 
 {% block conteudo %}
 <section class="card">
     <div class="page-title">
-        <h1>Serviços cadastrados</h1>
+        <h1>Agenda de serviços</h1>
         <a class="button" href="{{ url_for('novo_servico') }}">Novo serviço</a>
     </div>
 
-    <p>Tipos de serviço: banho, tosa, consultas e cuidados gerais.</p>
+    <p>Confira os serviços por data e horário. Tipos: banho, tosa, consultas e cuidados gerais.</p>
 
     {% if servicos %}
     <div class="record-grid">
@@ -26,6 +26,7 @@
             </div>
             <div class="record-details">
                 <span>Data: {{ s.data }}</span>
+                <span>Horário: {{ s.horario or 'Não informado' }}</span>
                 <span>Pet: {{ s.pet }}</span>
             </div>
             <div class="actions record-actions">
@@ -36,13 +37,15 @@
                     Preço não informado
                     {% endif %}
                 </span>
-                <a class="button button-secondary"
-                   href="{{ url_for('editar_servico', id=s.id) }}">Editar</a>
-                <form method="post"
-                      action="{{ url_for('excluir_servico', id=s.id) }}"
-                      onsubmit="return confirm('Excluir este serviço? Esta ação não pode ser desfeita.')">
-                    <button class="button-danger" type="submit">Excluir</button>
-                </form>
+                <div class="record-buttons">
+                    <a class="button button-secondary"
+                       href="{{ url_for('editar_servico', id=s.id) }}">Editar</a>
+                    <form method="post"
+                          action="{{ url_for('excluir_servico', id=s.id) }}"
+                          onsubmit="return confirm('Excluir este serviço? Esta ação não pode ser desfeita.')">
+                        <button class="button-danger" type="submit">Excluir</button>
+                    </form>
+                </div>
             </div>
         </article>
         {% endfor %}

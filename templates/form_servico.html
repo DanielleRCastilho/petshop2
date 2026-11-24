@@ -43,6 +43,17 @@
         </div>
 
         <div class="field">
+            <label for="horario">
+                Horário <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <input id="horario"
+                   type="time"
+                   name="horario"
+                   value="{{ servico.horario if servico and servico.horario else '' }}"
+                   required>
+        </div>
+
+        <div class="field">
             <label for="preco">Preço</label>
             <input id="preco"
                    type="number"

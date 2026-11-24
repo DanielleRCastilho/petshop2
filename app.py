@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from datetime import date
+from datetime import date, time
 
 from flask import Flask, abort, flash, render_template, request, redirect, url_for
 import db_sql
@@ -37,6 +37,17 @@ def validar_data(valor):
        date.fromisoformat(valor)
    except ValueError:
        abort(400, description="Informe uma data válida.")
+   return valor
+
+
+def validar_horario(valor):
+   valor = campo_obrigatorio("Horário", valor)
+   try:
+       horario = time.fromisoformat(valor)
+   except ValueError:
+       abort(400, description="Informe um horário válido.")
+   if horario.strftime("%H:%M") != valor:
+       abort(400, description="Informe um horário válido.")
    return valor
 
 
@@ -83,11 +94,13 @@ def novo_servico():
        if status not in STATUS_SERVICOS:
            abort(400, description="Selecione um status válido para o serviço.")
        data = validar_data(request.form.get("data"))
+       horario = validar_horario(request.form.get("horario"))
        preco = validar_preco(request.form.get("preco"))
        pet_id = validar_id(request.form.get("pet_id"), "pet", db_sql.buscar_pet)
        db_sql.inserir_servico(
            tipo,
            data,
+           horario,
            preco,
            pet_id,
            status,
@@ -115,12 +128,14 @@ def editar_servico(id):
        if status not in STATUS_SERVICOS:
            abort(400, description="Selecione um status válido para o serviço.")
        data = validar_data(request.form.get("data"))
+       horario = validar_horario(request.form.get("horario"))
        preco = validar_preco(request.form.get("preco"))
        pet_id = validar_id(request.form.get("pet_id"), "pet", db_sql.buscar_pet)
        db_sql.atualizar_servico(
            id,
            tipo,
            data,
+           horario,
            preco,
            pet_id,
            status,
@@ -143,7 +158,28 @@ def excluir_servico(id):
    return redirect(url_for("servicos"))
 
 def contato():
-   return render_template("contato.html")
+   return render_template("contato.html", info=db_sql.buscar_informacoes_contato())
+
+def editar_contato():
+   if request.method == "POST":
+       telefone = campo_obrigatorio("Telefone", request.form.get("telefone"))
+       email = campo_obrigatorio("Email", request.form.get("email"))
+       horario = campo_obrigatorio("Horário", request.form.get("horario"))
+       endereco = campo_obrigatorio("Endereço", request.form.get("endereco"))
+       if len(email) > 254:
+           abort(400, description="O email deve ter no máximo 254 caracteres.")
+       db_sql.atualizar_informacoes_contato(
+           telefone,
+           email,
+           horario,
+           endereco,
+       )
+       flash("Informações de contato atualizadas com sucesso.", "success")
+       return redirect(url_for("contato"))
+   return render_template(
+       "form_contato.html",
+       info=db_sql.buscar_informacoes_contato(),
+   )
 
 def lista_donos():
    return render_template("donos.html", donos=db_sql.listar_donos())
@@ -265,6 +301,11 @@ def _register_routes(app):
    app.add_url_rule("/servico/<int:id>/editar", view_func=editar_servico, methods=["GET", "POST"])
    app.add_url_rule("/servico/<int:id>/excluir", view_func=excluir_servico, methods=["POST"])
    app.add_url_rule("/contato", view_func=contato)
+   app.add_url_rule(
+       "/contato/editar",
+       view_func=editar_contato,
+       methods=["GET", "POST"],
+   )
    app.add_url_rule("/donos", view_func=lista_donos)
    app.add_url_rule("/donos/novo", view_func=novo_dono, methods=["GET", "POST"])
    app.add_url_rule("/dono/<int:id>/editar", view_func=editar_dono, methods=["GET", "POST"])

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block titulo %}Editar contato{% endblock %}
+
+{% block conteudo %}
+<section class="card">
+    <h1>Editar informações de contato</h1>
+    <p class="form-note">
+        <span class="required-mark">*</span> Todos os campos são obrigatórios.
+    </p>
+
+    <form class="form" method="post">
+        <div class="field">
+            <label for="telefone">
+                Telefone <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <input id="telefone"
+                   type="tel"
+                   name="telefone"
+                   autocomplete="tel"
+                   value="{{ info.telefone }}"
+                   required>
+        </div>
+
+        <div class="field">
+            <label for="email">
+                Email <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <input id="email"
+                   type="email"
+                   name="email"
+                   autocomplete="email"
+                   maxlength="254"
+                   value="{{ info.email }}"
+                   required>
+        </div>
+
+        <div class="field">
+            <label for="horario">
+                Horário <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <input id="horario"
+                   type="text"
+                   name="horario"
+                   value="{{ info.horario }}"
+                   required>
+        </div>
+
+        <div class="field">
+            <label for="endereco">
+                Endereço <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <textarea id="endereco"
+                      name="endereco"
+                      rows="3"
+                      required>{{ info.endereco }}</textarea>
+        </div>
+
+        <div class="actions">
+            <button type="submit">Salvar</button>
+            <a class="button button-secondary"
+               href="{{ url_for('contato') }}">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

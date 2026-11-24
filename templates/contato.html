@@ -4,23 +4,32 @@
 
 {% block conteudo %}
 <section class="card">
-    <h1>Contato</h1>
+    <div class="page-title">
+        <h1>Contato</h1>
+        <a class="button" href="{{ url_for('editar_contato') }}">
+            Editar informações
+        </a>
+    </div>
 
     <div class="info-grid">
         <div class="info-card">
             <strong>Telefone</strong>
-            (11) 99999-9999
+            {{ info.telefone }}
         </div>
 
         <div class="info-card">
             <strong>Email</strong>
-            contato@amigofiel.com
+            {{ info.email }}
         </div>
 
         <div class="info-card">
             <strong>Horário</strong>
-            Segunda a sábado<br>
-            Das 8h às 18h
+            {{ info.horario }}
+        </div>
+
+        <div class="info-card">
+            <strong>Endereço</strong>
+            {{ info.endereco }}
         </div>
     </div>
 </section>

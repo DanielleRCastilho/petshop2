@@ -22,6 +22,22 @@ def contar_registros():
        "(SELECT COUNT(*) FROM servicos) AS servicos"
    ).fetchone()
 
+def buscar_informacoes_contato():
+   return get_db().execute(
+       "SELECT telefone, email, horario, endereco "
+       "FROM informacoes_contato WHERE id = 1"
+   ).fetchone()
+
+def atualizar_informacoes_contato(telefone, email, horario, endereco):
+   db = get_db()
+   db.execute(
+       "UPDATE informacoes_contato "
+       "SET telefone = ?, email = ?, horario = ?, endereco = ? "
+       "WHERE id = 1",
+       (telefone, email, horario, endereco),
+   )
+   db.commit()
+
 def close_db(e=None):
    _ = e
    db = g.pop("db", None)
@@ -41,6 +57,9 @@ def init_db():
            "ALTER TABLE servicos "
            "ADD COLUMN status TEXT NOT NULL DEFAULT 'Agendado'"
        )
+       db.commit()
+   if "horario" not in colunas_servicos:
+       db.execute("ALTER TABLE servicos ADD COLUMN horario TEXT")
        db.commit()
    db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_donos_tel ON donos(tel)")
    db.commit()
@@ -149,39 +168,47 @@ def excluir_pet(id):
    db.execute("DELETE FROM pets WHERE id = ?", (id,))
    db.commit()
 
-def inserir_servico(tipo, data, preco, pet_id, status):
+def inserir_servico(tipo, data, horario, preco, pet_id, status):
    db = get_db()
    db.execute(
-       "INSERT INTO servicos (tipo, data, preco, pet_id, status) "
-       "VALUES (?, ?, ?, ?, ?)",
-       (tipo, data, preco, pet_id, status),
+       "INSERT INTO servicos (tipo, data, horario, preco, pet_id, status) "
+       "VALUES (?, ?, ?, ?, ?, ?)",
+       (tipo, data, horario, preco, pet_id, status),
    )
    db.commit()
 
 def listar_servicos():
    return get_db().execute(
-       "SELECT servicos.id, servicos.tipo, servicos.data, servicos.preco, "
+       "SELECT servicos.id, servicos.tipo, servicos.data, servicos.horario, "
+       "servicos.preco, "
        "servicos.pet_id, servicos.status, pets.nome AS pet "
        "FROM servicos INNER JOIN pets ON servicos.pet_id = pets.id "
-       "ORDER BY servicos.data DESC, servicos.id DESC"
+       "ORDER BY "
+       "CASE WHEN servicos.data >= date('now') THEN 0 ELSE 1 END, "
+       "CASE WHEN servicos.data >= date('now') THEN servicos.data END ASC, "
+       "CASE WHEN servicos.data >= date('now') THEN servicos.horario END ASC, "
+       "CASE WHEN servicos.data < date('now') THEN servicos.data END DESC, "
+       "CASE WHEN servicos.data < date('now') THEN servicos.horario END DESC, "
+       "servicos.id ASC"
    ).fetchall()
 
 def buscar_servico(id):
    return get_db().execute(
-       "SELECT servicos.id, servicos.tipo, servicos.data, servicos.preco, "
+       "SELECT servicos.id, servicos.tipo, servicos.data, servicos.horario, "
+       "servicos.preco, "
        "servicos.pet_id, servicos.status, pets.nome AS pet "
        "FROM servicos INNER JOIN pets ON servicos.pet_id = pets.id "
        "WHERE servicos.id = ?",
        (id,),
    ).fetchone()
 
-def atualizar_servico(id, tipo, data, preco, pet_id, status):
+def atualizar_servico(id, tipo, data, horario, preco, pet_id, status):
    db = get_db()
    db.execute(
-       "UPDATE servicos SET tipo = ?, data = ?, preco = ?, pet_id = ?, "
-       "status = ? "
+       "UPDATE servicos SET tipo = ?, data = ?, horario = ?, preco = ?, "
+       "pet_id = ?, status = ? "
        "WHERE id = ?",
-       (tipo, data, preco, pet_id, status, id),
+       (tipo, data, horario, preco, pet_id, status, id),
    )
    db.commit()
 

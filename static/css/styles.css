@@ -522,15 +522,34 @@ a.record-card:hover {
 
 .record-actions {
     width: 100%;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
     margin-top: auto;
     padding-top: 14px;
 }
 
 .record-price {
-    margin-right: auto;
     font-weight: bold;
     color: var(--green-dark);
+}
+
+.record-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.record-buttons form {
+    margin: 0;
+}
+
+.record-buttons .button,
+.record-buttons button {
+    padding-right: 12px;
+    padding-left: 12px;
+    white-space: nowrap;
 }
 
 .form {
